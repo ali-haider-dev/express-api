@@ -18,16 +18,17 @@ exports.protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Get user from the token
-      req.user = await User.findById(decoded.id);
+      // Get user from the token
+      req.user = await User.findById(decoded.id).select('-password');
 
       next();
     } catch (error) {
       console.error(error);
-      res.status(401).json({ success: false, message: 'Not authorized,Authentication failed' });
+      return res.status(401).json({ success: false, message: 'Not authorized, Authentication failed' });
     }
   }
 
   if (!token) {
-    res.status(401).json({ success: false, message: 'Not authorized,Authentication failed' });
+    return res.status(401).json({ success: false, message: 'Not authorized, Authentication failed' });
   }
 };

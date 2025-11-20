@@ -7,12 +7,15 @@ const connectDB = async () => {
   }
 
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000, // Fail after 5s if cannot connect
+      socketTimeoutMS: 45000,
+    });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Error: ${error.message}`);
-    // In serverless, we shouldn't exit the process, just throw the error
-    // process.exit(1); 
+    // Throw error so the calling function knows we failed
+    throw error;
   }
 };
 

@@ -18,8 +18,18 @@ exports.protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Get user from the token
-      // Get user from the token
-      req.user = await User.findById(decoded.id).select('-password');
+      const user = await User.findById(decoded.id).select('-password');
+
+      if (!user) {
+        return res.status(401).json({ success: false, message: 'Not authorized, User not found' });
+      }
+
+      // Check if token version matches user version
+      if (decoded.tokenVersion !== user.tokenVersion) {
+        return res.status(401).json({ success: false, message: 'Not authorized, Token invalid' });
+      }
+
+      req.user = user;
 
       next();
     } catch (error) {

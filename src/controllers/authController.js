@@ -46,6 +46,10 @@ exports.login = asyncHandler(async (req, res) => {
     throw new Error('Invalid credentials');
   }
 
+  // Increment token version to invalidate old tokens
+  user.tokenVersion += 1;
+  await user.save();
+
   sendTokenResponse(user, 200, res);
 });
 

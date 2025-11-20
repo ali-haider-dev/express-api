@@ -27,6 +27,10 @@ const UserSchema = new mongoose.Schema({
     enum: ['user', 'publisher','admin'],
     default: 'user',
   },
+  tokenVersion: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -50,7 +54,7 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 
 // Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: this._id, tokenVersion: this.tokenVersion }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };

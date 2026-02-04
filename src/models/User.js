@@ -22,11 +22,11 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     select: false, // Don't return password by default
   },
-  role: {
-    type: String,
-    enum: ['trader', 'mentor','admin'],
-    default: 'trader',
-  },
+  // role: {
+  //   type: String,
+  //   enum: ['trader', 'mentor','admin'],
+  //   default: 'trader',
+  // },
   tokenVersion: {
     type: Number,
     default: 0,

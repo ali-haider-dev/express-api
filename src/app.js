@@ -31,13 +31,50 @@ if (process.env.NODE_ENV === 'development') {
 // Mount routers
 app.use('/api/auth', authRoutes);
 
-// Error handler middleware (simple version)
+// Error handler middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(res.statusCode || 500).json({
+
+  let errorResponse = {
     success: false,
+    statusCode: err.statusCode || 500,
     error: err.message || 'Server Error',
-  });
+  };
+
+  // Mongoose bad ObjectId
+  if (err.name === 'CastError') {
+    errorResponse = {
+      success: false,
+      statusCode: 404,
+      error: 'Resource not found',
+    };
+  }
+
+  // Mongoose duplicate key
+  if (err.code === 11000) {
+    errorResponse = {
+      success: false,
+      statusCode: 400,
+      error: 'Duplicate field value entered',
+    };
+  }
+
+  // Mongoose validation error
+  if (err.name === 'ValidationError') {
+    const errors = {};
+    Object.keys(err.errors).forEach((key) => {
+      errors[key] = err.errors[key].message;
+    });
+
+    errorResponse = {
+      success: false,
+      statusCode: 400,
+      error: errors,
+    };
+  }
+
+  res.status(errorResponse.statusCode).json(errorResponse);
 });
+
 
 module.exports = app;

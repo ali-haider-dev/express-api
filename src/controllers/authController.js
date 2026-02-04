@@ -5,14 +5,12 @@ const User = require('../models/User');
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res) => {
-  const { name, email, password, role } = req.body;
-
+  const { name, email, password } = req.body;
   // Create user
   const user = await User.create({
     name,
     email,
     password,
-    role,
   });
 
   sendTokenResponse(user, 201, res);
@@ -25,25 +23,32 @@ exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   // Validate email & password
-  if (!email || !password) {
-    res.status(400);
-    throw new Error('Please provide an email and password');
+if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        email: !email ? "Email is required" : undefined,
+        password: !password ? "Password is required" : undefined,
+      },
+    });
   }
 
   // Check for user
   const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
-    res.status(401);
-    throw new Error('Invalid credentials');
+    const error = new Error('Invalid credentials');
+    error.statusCode = 401;
+    throw error;
   }
 
   // Check if password matches
   const isMatch = await user.matchPassword(password);
 
   if (!isMatch) {
-    res.status(401);
-    throw new Error('Invalid credentials');
+    const error = new Error('Invalid credentials');
+    error.statusCode = 401;
+    throw error;
   }
 
   // Increment token version to invalidate old tokens

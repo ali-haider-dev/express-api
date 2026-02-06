@@ -50,14 +50,14 @@ app.use((err, req, res, next) => {
     };
   }
 
-  // Mongoose duplicate key
-  if (err.code === 11000) {
-    errorResponse = {
-      success: false,
-      statusCode: 400,
-      error: 'Duplicate field value entered',
-    };
-  }
+  // // Mongoose duplicate key
+  // if (err.code === 11000) {
+  //   errorResponse = {
+  //     success: false,
+  //     statusCode: 400,
+  //     error: 'Duplicate field value entered',
+  //   };
+  // }
 
   // Mongoose validation error
   if (err.name === 'ValidationError') {
